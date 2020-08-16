@@ -27,7 +27,6 @@
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.3.0",
     "loader-utils": "^2.0.0",
-    "cheerio": "^1.0.0-rc.3",
     "webpack": "^4.44.1"
   },
   "husky": {
@@ -48,5 +47,8 @@
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3"
   }
 }
