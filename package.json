@@ -1,0 +1,52 @@
+{
+  "name": "link-file-plugin",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup -c",
+    "release": "yarn run build && git add . && git commit  && npm version patch && npm publish"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "devDependencies": {
+    "@types/webpack": "^4.41.21",
+    "@typescript-eslint/eslint-plugin": "^3.9.0",
+    "@typescript-eslint/parser": "^3.9.0",
+    "chalk": "^4.1.0",
+    "cheerio": "^1.0.0-rc.3",
+    "eslint": "^7.6.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
+    "prettier": "^2.0.5",
+    "prettier-plugin-jsdoc": "^0.0.23",
+    "rollup": "^2.23.1"
+  },
+  "peerDependencies": {
+    "file-loader": "^6.0.0",
+    "html-webpack-plugin": "^4.3.0",
+    "loader-utils": "^2.0.0",
+    "webpack": "^4.44.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx}": [
+      "eslint",
+      "eslint --fix",
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "eslintIgnore": [
+    "dist/*"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  }
+}
