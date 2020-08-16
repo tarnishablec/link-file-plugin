@@ -16,7 +16,6 @@
     "@typescript-eslint/eslint-plugin": "^3.9.0",
     "@typescript-eslint/parser": "^3.9.0",
     "chalk": "^4.1.0",
-    "cheerio": "^1.0.0-rc.3",
     "eslint": "^7.6.0",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
@@ -28,6 +27,7 @@
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.3.0",
     "loader-utils": "^2.0.0",
+    "cheerio": "^1.0.0-rc.3",
     "webpack": "^4.44.1"
   },
   "husky": {
