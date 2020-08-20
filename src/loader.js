@@ -22,6 +22,7 @@ export default function loader(content) {
    * @type {Compilation}
    */
   const compilation = this._compilation
+  // debugger
   compilation.hooks.linkFile.call(url, options)
   this.callback(null, content)
   return

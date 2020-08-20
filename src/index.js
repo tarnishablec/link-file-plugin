@@ -49,7 +49,7 @@ import { yellowBright } from 'chalk'
 
 class LinkFilePlugin {
   constructor() {
-    /** @type {Map<string, Options>} */
+    /** @type {Map<string, Options[]>} */
     this.urls = new Map()
   }
   /** @param {Compiler} compiler */
@@ -73,7 +73,8 @@ class LinkFilePlugin {
          * @param {Options} options
          */
         (url, options) => {
-          this.urls.set(url, options)
+          let opt = this.urls.get(url)
+          this.urls.set(url, opt ? mergeOptions(opt, options) : options)
         }
       )
 
@@ -96,20 +97,23 @@ class LinkFilePlugin {
 
             const { html } = htmlPluginData
             const $ = load(html, { decodeEntities: false })
-            this.urls.forEach((opt, url) => {
-              const { rels, slient, ...attrs } = opt
+            this.urls.forEach((opts, url) => {
+              opts.forEach((opt) => {
+                const { rels, slient, ...attrs } = opt
 
-              const attr = Object.entries(attrs).reduce((acc, [k, v]) => {
-                return `${acc} ${`${k}="${v}"`}`
-              }, '')
+                const attr = Object.entries(attrs).reduce(
+                  (acc, [k, v]) => `${acc} ${`${k}="${v}"`}`,
+                  ''
+                )
 
-              $('head').append(
-                `<link rel="${rels
-                  .filter(Boolean)
-                  .join(' ')}" href="${url}" ${attr}>`
-              )
-              !slient &&
-                console.log(yellowBright(`inject ${url} to your template`))
+                $('head').append(
+                  `<link rel="${rels
+                    .filter(Boolean)
+                    .join(' ')}" href="${url}" ${attr}>`
+                )
+                !slient &&
+                  console.log(yellowBright(`inject ${url} to your template`))
+              })
             })
             htmlPluginData.html = $.html()
             return htmlPluginData
@@ -119,6 +123,25 @@ class LinkFilePlugin {
       }
     })
   }
+}
+
+/**
+ * @param {Options} opt1
+ * @param {Options} opt2
+ * @returns {Options[]}
+ */
+function mergeOptions(opt1, opt2) {
+  const { rels: rels1, slient: slient1, ...attrs1 } = opt1
+  const { rels: rels2, slient: slient2, ...attrs2 } = opt2
+  const keys = [...Object.keys(attrs1), ...Object.keys(attrs2)]
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i]
+    if (attrs1[key] !== attrs2[key]) {
+      return [opt1, opt2]
+    }
+  }
+  const rels = [...new Set([...rels1, ...rels2])]
+  return [{ rels, slient: slient1 || slient2, ...attrs1 }]
 }
 
 LinkFilePlugin.loader = require.resolve('./loader')
