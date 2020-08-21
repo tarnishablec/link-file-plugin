@@ -27,7 +27,6 @@
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.3.0",
     "husky": "^4.2.5",
-    "install-peers-cli": "^2.2.0",
     "lint-staged": "^10.2.11",
     "prettier": "^2.0.5",
     "prettier-plugin-jsdoc": "^0.0.23",
@@ -40,7 +39,8 @@
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.3.0",
     "loader-utils": "^2.0.0",
-    "webpack": "^4.44.1"
+    "webpack": "^4.44.1",
+    "install-peers-cli": "^2.2.0"
   },
   "husky": {
     "hooks": {
