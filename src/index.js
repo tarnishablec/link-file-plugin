@@ -70,11 +70,23 @@ class LinkFilePlugin {
         pluginName,
         /**
          * @param {string} url
-         * @param {Options} options
+         * @param {Options} option
          */
-        (url, options) => {
-          let opt = this.urls.get(url)
-          this.urls.set(url, opt ? mergeOptions(opt, options) : options)
+        (url, option) => {
+          let opts = this.urls.get(url)
+          if (!opts) {
+            this.urls.set(url, [option])
+          } else {
+            for (let i = 0; i < opts.length; i++) {
+              const opt = opts[i]
+              const should = shouldMergeOptions(opt, option)
+              if (should) {
+                mergeOptions(opt, option)
+                return
+              }
+            }
+            this.urls.set(url, [...opts, option])
+          }
         }
       )
 
@@ -128,20 +140,33 @@ class LinkFilePlugin {
 /**
  * @param {Options} opt1
  * @param {Options} opt2
- * @returns {Options[]}
+ * @returns {boolean}
  */
-function mergeOptions(opt1, opt2) {
+function shouldMergeOptions(opt1, opt2) {
+  // eslint-disable-next-line no-unused-vars
   const { rels: rels1, slient: slient1, ...attrs1 } = opt1
+  // eslint-disable-next-line no-unused-vars
   const { rels: rels2, slient: slient2, ...attrs2 } = opt2
   const keys = [...Object.keys(attrs1), ...Object.keys(attrs2)]
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i]
     if (attrs1[key] !== attrs2[key]) {
-      return [opt1, opt2]
+      return false
     }
   }
-  const rels = [...new Set([...rels1, ...rels2])]
-  return [{ rels, slient: slient1 || slient2, ...attrs1 }]
+  return true
+}
+
+/**
+ * @param {Options} opt1
+ * @param {Options} opt2
+ * @returns {Options}
+ */
+function mergeOptions(opt1, opt2) {
+  const { rels: rels1, slient: slient1 } = opt1
+  const { rels: rels2, slient: slient2 } = opt2
+  opt1.rels = [...new Set([...rels1, ...rels2])]
+  opt1.slient = slient1 || slient2
 }
 
 LinkFilePlugin.loader = require.resolve('./loader')
