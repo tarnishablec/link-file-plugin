@@ -66,7 +66,11 @@ class LinkFilePlugin {
         'linkFile',
         new SyncHook(['url', 'options'])
       )
-      compilation.hooks['linkFile'].tap(
+
+      /** @type {import('tapable').SyncHook} */
+      const linkFileHook = Reflect.get(compilation.hooks, 'linkFile')
+
+      linkFileHook.tap(
         pluginName,
         /**
          * @param {string} url
@@ -97,6 +101,7 @@ class LinkFilePlugin {
             const { assets } = compilation
             const keys = Object.keys(assets)
 
+            /** @type {string[]} */
             const dels = []
             this.urls.forEach((_, link) => {
               if (!keys.includes(link)) {
@@ -120,7 +125,7 @@ class LinkFilePlugin {
 
                 $('head').append(
                   `<link rel="${rels
-                    .filter(Boolean)
+                    ?.filter(Boolean)
                     .join(' ')}" href="${url}" ${attr}>`
                 )
                 !slient &&
@@ -150,6 +155,7 @@ function shouldMergeOptions(opt1, opt2) {
   const keys = [...Object.keys(attrs1), ...Object.keys(attrs2)]
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i]
+    // @ts-ignore
     if (attrs1[key] !== attrs2[key]) {
       return false
     }
@@ -160,12 +166,11 @@ function shouldMergeOptions(opt1, opt2) {
 /**
  * @param {Options} opt1
  * @param {Options} opt2
- * @returns {Options}
  */
 function mergeOptions(opt1, opt2) {
   const { rels: rels1, slient: slient1 } = opt1
   const { rels: rels2, slient: slient2 } = opt2
-  opt1.rels = [...new Set([...rels1, ...rels2])]
+  opt1.rels = [...new Set([...(rels1 ?? []), ...(rels2 ?? [])])]
   opt1.slient = slient1 || slient2
 }
 

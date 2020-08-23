@@ -7,23 +7,20 @@
 const loaderUtils = require('loader-utils')
 
 /**
- * @this {LoaderContext}
  * @param {string} content
+ * @this {LoaderContext}
  */
 export default function loader(content) {
+  const url = content.match(/"(\S+)"/)?.[1] ?? ''
+  if (!url) throw new Error('url can not be empty')
   /** @type {Options} */
-  const url = content.match(/"(\S+)"/)[1]
-  if(!url) throw new Error("url can not be empty")
-  /**
-   * @type {Options}
-   */
   const options = loaderUtils.getOptions(this)
-  /**
-   * @type {Compilation}
-   */
+  /** @type {Compilation} */
   const compilation = this._compilation
   // debugger
-  compilation.hooks.linkFile.call(url, options)
+  /** @type {import('tapable').SyncHook} */
+  const linkFileHook = Reflect.get(compilation.hooks, 'linkFile')
+  linkFileHook.call(url, options)
   this.callback(null, content)
   return
 }
