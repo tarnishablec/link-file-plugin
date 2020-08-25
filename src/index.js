@@ -124,9 +124,9 @@ class LinkFilePlugin {
                 )
 
                 $('head').append(
-                  `<link rel="${rels
-                    ?.filter(Boolean)
-                    .join(' ')}" href="${url}" ${attr}>`
+                  `<link rel="${
+                    rels ? rels.filter(Boolean).join(' ') : ''
+                  }" href="${url}" ${attr}>`
                 )
                 !slient &&
                   console.log(yellowBright(`inject ${url} to your template`))
