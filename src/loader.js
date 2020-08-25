@@ -11,7 +11,8 @@ const loaderUtils = require('loader-utils')
  * @this {LoaderContext}
  */
 export default function loader(content) {
-  const url = content.match(/"(\S+)"/)?.[1] ?? ''
+  const matches = content.match(/"(\S+)"/)
+  const url = matches && matches[1]
   if (!url) throw new Error('url can not be empty')
   /** @type {Options} */
   const options = loaderUtils.getOptions(this)
