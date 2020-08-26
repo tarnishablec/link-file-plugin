@@ -43,7 +43,6 @@
   "peerDependencies": {
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.3.0",
-    "loader-utils": "^2.0.0",
     "webpack": "^4.44.1"
   },
   "husky": {
@@ -67,6 +66,7 @@
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
-    "install-peers-cli": "^2.2.0"
+    "install-peers-cli": "^2.2.0",
+    "loader-utils": "^2.0.0"
   }
 }

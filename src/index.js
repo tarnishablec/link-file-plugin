@@ -61,9 +61,9 @@ class LinkFilePlugin {
 
     compiler.hooks.shouldEmit.tap(pluginName, (compilation) => {
       if (HtmlWebpackPlugin) {
-        HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tap(
+        HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
           pluginName,
-          (htmlPluginData) => {
+          (htmlPluginData, cb) => {
             const { assets } = compilation
             const keys = Object.keys(assets)
 
@@ -99,7 +99,7 @@ class LinkFilePlugin {
               })
             })
             htmlPluginData.html = $.html()
-            return htmlPluginData
+            cb(null, htmlPluginData)
             // debugger
           }
         )
