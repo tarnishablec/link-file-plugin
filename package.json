@@ -15,6 +15,9 @@
   ],
   "devDependencies": {
     "2string-loader": "^1.0.0",
+    "@babel/core": "^7.11.4",
+    "@babel/preset-env": "^7.11.0",
+    "@rollup/plugin-babel": "^5.2.0",
     "@types/cheerio": "^0.22.21",
     "@types/loader-utils": "^2.0.1",
     "@types/webpack": "^4.41.21",

@@ -125,7 +125,7 @@ class LinkFilePlugin {
 
                 $('head').append(
                   `<link rel="${
-                    rels ? rels.filter(Boolean).join(' ') : ''
+                    rels?.filter(Boolean).join(' ') ?? ''
                   }" href="${url}" ${attr}>`
                 )
                 !slient &&
@@ -170,7 +170,7 @@ function shouldMergeOptions(opt1, opt2) {
 function mergeOptions(opt1, opt2) {
   const { rels: rels1, slient: slient1 } = opt1
   const { rels: rels2, slient: slient2 } = opt2
-  opt1.rels = [...new Set([...(rels1 || []), ...(rels2 || [])])]
+  opt1.rels = [...new Set([...(rels1 ?? []), ...(rels2 ?? [])])]
   opt1.slient = slient1 || slient2
 }
 
