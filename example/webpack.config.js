@@ -23,7 +23,7 @@ module.exports = () => {
               rules: [
                 {
                   loader: LinkFilePlugin.loader,
-                  options: { rels: ['preload'], as: 'style', slient: true }
+                  options: { rels: ['preload'], as: 'style', slient: false }
                 },
                 {
                   loader: 'file-loader',

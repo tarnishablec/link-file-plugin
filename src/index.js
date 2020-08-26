@@ -59,41 +59,7 @@ class LinkFilePlugin {
     if (Reflect.get(compiler.hooks, 'linkFile'))
       throw new Error('Hooks Existed!')
 
-    compiler.hooks.compilation.tap(pluginName, (compilation) => {
-      // this.links = []
-      Reflect.set(
-        compilation.hooks,
-        'linkFile',
-        new SyncHook(['url', 'options'])
-      )
-
-      /** @type {import('tapable').SyncHook} */
-      const linkFileHook = Reflect.get(compilation.hooks, 'linkFile')
-
-      linkFileHook.tap(
-        pluginName,
-        /**
-         * @param {string} url
-         * @param {Options} option
-         */
-        (url, option) => {
-          let opts = this.urls.get(url)
-          if (!opts) {
-            this.urls.set(url, [option])
-          } else {
-            for (let i = 0; i < opts.length; i++) {
-              const opt = opts[i]
-              const should = shouldMergeOptions(opt, option)
-              if (should) {
-                mergeOptions(opt, option)
-                return
-              }
-            }
-            this.urls.set(url, [...opts, option])
-          }
-        }
-      )
-
+    compiler.hooks.shouldEmit.tap(pluginName, (compilation) => {
       if (HtmlWebpackPlugin) {
         HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tap(
           pluginName,
@@ -138,6 +104,42 @@ class LinkFilePlugin {
           }
         )
       }
+    })
+
+    compiler.hooks.compilation.tap(pluginName, (compilation) => {
+      // this.links = []
+      Reflect.set(
+        compilation.hooks,
+        'linkFile',
+        new SyncHook(['url', 'options'])
+      )
+
+      /** @type {import('tapable').SyncHook} */
+      const linkFileHook = Reflect.get(compilation.hooks, 'linkFile')
+
+      linkFileHook.tap(
+        pluginName,
+        /**
+         * @param {string} url
+         * @param {Options} option
+         */
+        (url, option) => {
+          let opts = this.urls.get(url)
+          if (!opts) {
+            this.urls.set(url, [option])
+          } else {
+            for (let i = 0; i < opts.length; i++) {
+              const opt = opts[i]
+              const should = shouldMergeOptions(opt, option)
+              if (should) {
+                mergeOptions(opt, option)
+                return
+              }
+            }
+            this.urls.set(url, [...opts, option])
+          }
+        }
+      )
     })
   }
 }
