@@ -8,6 +8,7 @@
     "test": "yarn run build && webpack --config ./example/webpack.config.js",
     "release": "yarn run build && git add . && git commit  && npm version patch && npm publish"
   },
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "src"
@@ -22,7 +23,7 @@
     "@types/webpack": "^4.41.21",
     "@typescript-eslint/eslint-plugin": "^3.10.1",
     "@typescript-eslint/parser": "^3.10.1",
-    "chalk": "^4.1.0",
+    "@wessberg/rollup-plugin-ts": "^1.3.3",
     "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^4.2.2",
     "eslint": "^7.7.0",
@@ -31,9 +32,10 @@
     "file-loader": "^6.0.0",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.13",
+    "npm-check-updates": "^8.0.1",
     "prettier": "^2.1.1",
-    "prettier-plugin-jsdoc": "^0.0.26",
-    "rollup": "^2.26.5",
+    "prettier-plugin-jsdoc": "^0.1.1",
+    "rollup": "^2.26.8",
     "typescript": "^4.0.2",
     "webpack-cli": "^3.3.12"
   },
@@ -63,6 +65,7 @@
     "cheerio": "^1.0.0-rc.3",
     "html-webpack-plugin": "^4.3.0",
     "loader-utils": "^2.0.0",
-    "webpack": "^4.44.1"
+    "webpack": "^4.44.1",
+    "chalk": "^4.1.0"
   }
 }

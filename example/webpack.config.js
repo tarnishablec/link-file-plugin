@@ -12,6 +12,7 @@ module.exports = () => {
       filename: '[name].js',
       libraryTarget: 'umd'
     },
+    mode: 'production',
     resolve: { extensions: ['.js', '.css'] },
     module: {
       rules: [
