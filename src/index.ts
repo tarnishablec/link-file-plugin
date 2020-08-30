@@ -46,7 +46,7 @@ type Option = {
   slient?: boolean
 } & LinkAttr
 
-class LinkFilePlugin {
+export class LinkFilePlugin {
   static loader = require.resolve('./loader')
   urls: Map<string, Option[]>
 
@@ -173,4 +173,3 @@ function mergeOptions(opt1: Option, opt2: Option) {
 }
 
 // LinkFilePlugin.loader = require.resolve('./loader')
-export default LinkFilePlugin
