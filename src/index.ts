@@ -50,6 +50,17 @@ export class LinkFilePlugin {
   static loader = require.resolve('./loader')
   urls: Map<string, Option[]>
 
+  protected static hooks = new WeakMap<
+    webpack.Compilation,
+    { linkFile: SyncHook<[string, Option]> }
+  >()
+
+  static getHooks(
+    compilation: webpack.Compilation
+  ): { linkFile: SyncHook<[string, Option]> } | undefined {
+    return LinkFilePlugin.hooks.get(compilation)
+  }
+
   constructor() {
     this.urls = new Map()
   }
@@ -61,14 +72,13 @@ export class LinkFilePlugin {
 
     compiler.hooks.shouldEmit.tap(
       pluginName,
-      (compilation: webpack.compilation.Compilation) => {
+      (compilation: webpack.Compilation) => {
         if (HtmlWebpackPlugin) {
           HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
             pluginName,
             (htmlPluginData, cb) => {
               const { assets } = compilation
               const keys = Object.keys(assets)
-
               const dels: string[] = []
               this.urls.forEach((_, link) => {
                 if (!keys.includes(link)) {
@@ -105,22 +115,21 @@ export class LinkFilePlugin {
             }
           )
         }
+        return false
       }
     )
 
     compiler.hooks.compilation.tap(
       pluginName,
-      (compilation: webpack.compilation.Compilation) => {
+      (compilation: webpack.Compilation) => {
         // this.links = []
-        Reflect.set(
-          compilation.hooks,
-          'linkFile',
-          new SyncHook(['url', 'options'])
-        )
-
-        const linkFileHook = Reflect.get(compilation.hooks, 'linkFile')
-
-        linkFileHook.tap(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        LinkFilePlugin.hooks.set(compilation, {
+          linkFile: new SyncHook<[string, Option]>(['url', 'option'])
+        })
+        const linkFileHook = LinkFilePlugin.getHooks(compilation)?.linkFile
+        linkFileHook?.tap(
           pluginName,
           /**
            * @param {string} url

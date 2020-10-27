@@ -1,5 +1,5 @@
 const path = require('path')
-const LinkFilePlugin = require('../dist/index')
+const { LinkFilePlugin } = require('../dist/index')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
