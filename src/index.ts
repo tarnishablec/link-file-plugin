@@ -70,90 +70,84 @@ export class LinkFilePlugin {
     if (Reflect.get(compiler.hooks, 'linkFile'))
       throw new Error('Hooks Existed!')
 
-    compiler.hooks.shouldEmit.tap(
-      pluginName,
-      (compilation: webpack.Compilation) => {
-        if (HtmlWebpackPlugin) {
-          HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
-            pluginName,
-            (htmlPluginData, cb) => {
-              const { assets } = compilation
-              const keys = Object.keys(assets)
-              const dels: string[] = []
-              this.urls.forEach((_, link) => {
-                if (!keys.includes(link)) {
-                  dels.push(link)
-                }
-              })
-              dels.forEach((del) => {
-                this.urls.delete(del)
-              })
+    compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
+      // debugger
+      // LinkFilePlugin.hooks.set(compilation, {
+      //   linkFile: new SyncHook<[string, Option]>(['url', 'option'])
+      // })
+      const linkFileHook = new SyncHook<[string, Option]>(['url', 'option'])
 
-              const { html } = htmlPluginData
-              const $ = load(html, { decodeEntities: false })
-              this.urls.forEach((opts, url) => {
-                opts.forEach((opt) => {
-                  const { rels, slient, ...attrs } = opt
+      Reflect.set(compilation, '_link_customHooks', linkFileHook)
 
-                  const attr = Object.entries(attrs).reduce(
-                    (acc, [k, v]) => `${acc} ${`${k}="${v}"`}`,
-                    ''
-                  )
-
-                  $('head').append(
-                    `<link rel="${
-                      rels?.filter(Boolean).join(' ') ?? ''
-                    }" href="${url}" ${attr}>`
-                  )
-                  !slient &&
-                    console.log(yellowBright(`inject ${url} to your template`))
-                })
-              })
-              htmlPluginData.html = $.html()
-              cb(null, htmlPluginData)
-              // debugger
+      linkFileHook?.tap(pluginName, (url, option) => {
+        const opts = this.urls.get(url)
+        if (!opts) {
+          this.urls.set(url, [option])
+        } else {
+          for (let i = 0; i < opts.length; i++) {
+            const opt = opts[i]
+            const should = shouldMergeOptions(opt, option)
+            if (should) {
+              mergeOptions(opt, option)
+              return
             }
-          )
+          }
+          this.urls.set(url, [...opts, option])
         }
-        return false
-      }
-    )
+      })
 
-    compiler.hooks.compilation.tap(
-      pluginName,
-      (compilation: webpack.Compilation) => {
-        // this.links = []
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        LinkFilePlugin.hooks.set(compilation, {
-          linkFile: new SyncHook<[string, Option]>(['url', 'option'])
-        })
-        const linkFileHook = LinkFilePlugin.getHooks(compilation)?.linkFile
-        linkFileHook?.tap(
+      if (HtmlWebpackPlugin) {
+        HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
           pluginName,
-          /**
-           * @param {string} url
-           * @param {Option} option
-           */
-          (url: string, option: Option) => {
-            const opts = this.urls.get(url)
-            if (!opts) {
-              this.urls.set(url, [option])
-            } else {
-              for (let i = 0; i < opts.length; i++) {
-                const opt = opts[i]
-                const should = shouldMergeOptions(opt, option)
-                if (should) {
-                  mergeOptions(opt, option)
-                  return
-                }
+          (htmlPluginData, cb) => {
+            const { assets } = compilation
+            const keys = Object.keys(assets)
+            const dels: string[] = []
+            this.urls.forEach((_, link) => {
+              if (!keys.includes(link)) {
+                dels.push(link)
               }
-              this.urls.set(url, [...opts, option])
-            }
+            })
+            dels.forEach((del) => {
+              this.urls.delete(del)
+            })
+
+            const { html } = htmlPluginData
+            const $ = load(html, { decodeEntities: false })
+            this.urls.forEach((opts, url) => {
+              opts.forEach((opt) => {
+                const { rels, slient, ...attrs } = opt
+
+                const attr = Object.entries(attrs).reduce(
+                  (acc, [k, v]) => `${acc} ${`${k}="${v}"`}`,
+                  ''
+                )
+
+                $('head').append(
+                  `<link rel="${
+                    rels?.filter(Boolean).join(' ') ?? ''
+                  }" href="${url}" ${attr}>`
+                )
+                !slient &&
+                  console.log(yellowBright(`inject ${url} to your template`))
+              })
+            })
+            htmlPluginData.html = $.html()
+            cb(null, htmlPluginData)
+            // debugger
           }
         )
       }
-    )
+    })
+
+    // compiler.hooks.compilation.tap(
+    //   pluginName,
+    //   (compilation: webpack.Compilation) => {
+    //     // this.links = []
+    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //     // @ts-ignore
+    //   }
+    // )
   }
 }
 
